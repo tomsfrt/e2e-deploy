@@ -1,0 +1,56 @@
+apiVersion: v1
+items:
+- apiVersion: projectcontour.io/v1
+  kind: TLSCertificateDelegation
+  metadata:
+    annotations:
+      kapp.k14s.io/identity: v1;projectcontour/projectcontour.io/TLSCertificateDelegation/contour-delegation;projectcontour.io/v1
+      kapp.k14s.io/original: '{"apiVersion":"projectcontour.io/v1","kind":"TLSCertificateDelegation","metadata":{"labels":{"kapp.k14s.io/app":"1611102593771517000","kapp.k14s.io/association":"v1.24dcfe1c0c1e0d376bacff606f26562e"},"name":"contour-delegation","namespace":"projectcontour"},"spec":{"delegations":[{"secretName":"contour-tls","targetNamespaces":["*"]}]}}'
+      kapp.k14s.io/original-diff: |
+        - type: test
+          path: /metadata/annotations
+          value: {}
+        - type: remove
+          path: /metadata/annotations
+      kapp.k14s.io/original-diff-full: ""
+      kapp.k14s.io/original-diff-md5: c6e94dc94aed3401b5d0f26ed6c0bff3
+    creationTimestamp: "2021-01-20T00:29:58Z"
+    generation: 1
+    labels:
+      kapp.k14s.io/app: "1611102593771517000"
+      kapp.k14s.io/association: v1.24dcfe1c0c1e0d376bacff606f26562e
+    managedFields:
+    - apiVersion: projectcontour.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:kapp.k14s.io/identity: {}
+            f:kapp.k14s.io/original: {}
+            f:kapp.k14s.io/original-diff: {}
+            f:kapp.k14s.io/original-diff-full: {}
+            f:kapp.k14s.io/original-diff-md5: {}
+          f:labels:
+            .: {}
+            f:kapp.k14s.io/app: {}
+            f:kapp.k14s.io/association: {}
+        f:spec:
+          .: {}
+          f:delegations: {}
+      manager: kapp
+      operation: Update
+      time: "2021-01-20T00:29:58Z"
+    name: contour-delegation
+    resourceVersion: "85072"
+    selfLink: /apis/projectcontour.io/v1/namespaces/projectcontour/tlscertificatedelegations/contour-delegation
+    uid: aafd2edf-1182-40db-95b5-0c4d766bfbce
+  spec:
+    delegations:
+    - secretName: eduk8s-cert-tls
+      targetNamespaces:
+      - '*'
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
