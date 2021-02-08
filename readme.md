@@ -1,4 +1,4 @@
-# TKG e2e Install Automation
+# Tanzu e2e Install Automation
 
 ## Background
 Automate the install of common tooling for end2end demos.  This project assumes that you have a clean cluster with a bastion host that can
