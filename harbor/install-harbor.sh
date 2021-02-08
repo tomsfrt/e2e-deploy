@@ -4,7 +4,6 @@ pull_secret=$WORKING_DIR/../common/pull-secret.yaml
 
 helm repo add harbor https://helm.goharbor.io
 helm repo update
-kubectl create ns harbor -o yaml --dry-run=client| kubectl apply -f-
 
 ytt -f $WORKING_DIR/harbor-helm-values.yaml -f $1 | helm template harbor/harbor --name-template harbor -f- > $WORKING_DIR/chart.yaml
 

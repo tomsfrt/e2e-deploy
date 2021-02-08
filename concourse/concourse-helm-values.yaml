@@ -12,7 +12,6 @@ web:
     hosts: #@ ["concourse.{}".format(data.values.ingress.domain)]
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-staging
-      ingress.kubernetes.io/force-ssl-redirect: "true"
       kubernetes.io/ingress.class: contour
       kubernetes.io/tls-acme: "true"
 secrets:
