@@ -105,19 +105,19 @@ jobs:
               echo $KUBECONFIG_JSON>kubeconfig.json
               export KUBECONFIG=kubeconfig.json
               set +e
-              kp image list -n ((petclinic.tbsNamespace)) | grep "spring-petclinic" 
+              kp image list -n petclinic | grep "spring-petclinic" 
               exists=$?
               set -e
               if [ $exists -eq 0 ]; then
                 kp image patch spring-petclinic \
-                  --namespace ((petclinic.tbsNamespace)) \
+                  --namespace petclinic \
                   --local-path target/spring-petclinic-2.3.0.BUILD-SNAPSHOT.jar \
                   --wait
               else
                 kp image create spring-petclinic \
                   --tag ((petclinic.image)) \
                   --cluster-builder default \
-                  --namespace ((petclinic.tbsNamespace)) \
+                  --namespace petclinic \
                   --local-path target/spring-petclinic-2.3.0.BUILD-SNAPSHOT.jar \
                   --wait
               fi
@@ -159,7 +159,7 @@ jobs:
               petclinic:
                 host: ((petclinic.host))
                 image: ((petclinic.image))@$DIGEST
-                namespace: ((petclinic.tbsNamespace))
+                namespace: petclinic
                 wavefront:
                   applicationName: ((petclinic.wavefrontApplicationName))
                   uri: ((petclinic.wavefrontUri))
@@ -167,6 +167,6 @@ jobs:
               EOF
               cat config-repo/k8s/values.yml
               
-              ytt -f config-repo/k8s --ignore-unknown-comments | kapp deploy -n ((petclinic.tbsNamespace)) -a petclinic -y -f -
+              ytt -f config-repo/k8s --ignore-unknown-comments | kapp deploy -n petclinic -a petclinic -y -f -
 
 
