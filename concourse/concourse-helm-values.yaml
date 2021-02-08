@@ -10,9 +10,15 @@ web:
   ingress:
     enabled: true
     hosts: #@ ["concourse.{}".format(data.values.ingress.domain)]
+    tls:
+      - secretName: concourse-web-tls
+        hosts:
+          - #@ ["concourse.{}".format(data.values.ingress.domain)]
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-staging
       kubernetes.io/ingress.class: contour
       kubernetes.io/tls-acme: "true"
+      ingress.kubernetes.io/force-ssl-redirect: "true"
+
 secrets:
   localUsers: #@ "{}:{}".format(data.values.concourse.username,data.values.concourse.password)
