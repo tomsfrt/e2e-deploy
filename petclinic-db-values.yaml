@@ -1,0 +1,28 @@
+image:
+  registry: $MYSQL_REGISTRY
+metrics:
+  image:
+    registry: $MYSQL_REGISTRY
+db:
+  name: petclinic
+  password: petclinic
+  user: petclinic
+replication:
+  enabled: false
+root:
+  password: petclinic
+primary:
+  livenessProbe:
+    enabled: false
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+    successThreshold: 1
