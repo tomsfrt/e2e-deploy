@@ -27,6 +27,10 @@ cd e2e-deploy
 
 chmod +x env-install.sh
 
+#make sure you have kubectl access to your cluster
+
+#edit the values.yaml to customize your install
+
 ./env-install.sh
 
 ```
