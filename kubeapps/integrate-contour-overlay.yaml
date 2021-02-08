@@ -7,7 +7,7 @@ metadata:
   name: #@ name
 #@ end
 
-#@overlay/match by=overlay.subset(resource("Ingress","kubeapps")),expects0+
+#@overlay/match by=overlay.subset(resource("Ingress","kubeapps")),expects="0+"
 ---
 metadata:
   #@overlay/match missing_ok=True
