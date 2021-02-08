@@ -4,7 +4,8 @@ pull_secret=$WORKING_DIR/../common/pull-secret.yaml
 
 helm repo add harbor https://helm.goharbor.io
 helm repo update
+kubectl create ns harbor -o yaml --dry-run=client| kubectl apply -f-
 
-ytt -f harbor-helm-values.yaml -f $1 | helm template harbor/harbor --name-template harbor -f- > chart.yaml
+ytt -f $WORKING_DIR/harbor-helm-values.yaml -f $1 | helm template harbor/harbor --name-template harbor -f- > $WORKING_DIR/chart.yaml
 
-ytt -f harbor-dependencies.yaml -f $1 -f chart.yaml -f integrate-contour-overlay.yaml -f $pull_secret --file-mark 'chart.yaml:type=yaml-plain' | kapp deploy -a harbor -n harbor -f- --diff-changes --yes
+ytt -f $WORKING_DIR/harbor-dependencies.yaml -f $1 -f $WORKING_DIR/chart.yaml -f $WORKING_DIR/integrate-contour-overlay.yaml -f $pull_secret --file-mark 'chart.yaml:type=yaml-plain' | kapp deploy -a harbor -n harbor -f- --diff-changes --yes
