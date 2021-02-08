@@ -1,1 +1,0 @@
-ytt -f tls-cert-delegation.yaml -f $1 | kapp deploy -a certificate -f- --diff-changes --yes

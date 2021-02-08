@@ -13,3 +13,8 @@ metadata:
   annotations:
     #@overlay/match missing_ok=True
     projectcontour.io/response-timeout: "900s"
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    kubernetes.io/ingress.class: contour
+    kubernetes.io/tls-acme: "true"
+
