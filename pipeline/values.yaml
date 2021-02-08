@@ -13,7 +13,7 @@ petclinic:
   tbs:
     namespace:
 commonSecrets:
-  harborDomain: harbor.e2e.tsfrt.info/
+  harborDomain: test.tsfrt.info
   harborUser: admin
   harborPassword: Harbor12345
   kubeconfigBuildServer:
