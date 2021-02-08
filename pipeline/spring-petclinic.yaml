@@ -1,0 +1,172 @@
+resources:
+- name: source-code
+  type: git
+  source:
+    uri: ((petclinic.codeRepo))
+    branch: main
+- name: config-repo
+  type: git
+  source:
+    uri: ((petclinic.configRepo))
+    branch: master
+    paths:
+     - "k8s/**"
+- name: spring-petclinic-image
+  type: docker-image
+  source:
+    insecure_registries: [((common-secrets.harborDomain))]
+    repository: ((petclinic.image))
+    tag: latest
+
+jobs:
+- name: continuous-integration
+  plan:
+    - get: source-code
+      trigger: true
+    - task: compile-and-test
+      output_mapping:
+        target: target
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: ((common-secrets.harborDomain))/tanzu-e2e/adoptopenjdk
+            insecure_registries: [((common-secrets.harborDomain))]
+            tag: 11-jdk-hotspot
+        inputs:
+          - name: source-code
+        outputs:
+          - name: target
+        caches:
+          - path: source-code/maven
+        run:
+          path: /bin/bash
+          args:
+            - -c
+            - |
+              cd source-code
+              if [[ -d $PWD/maven && ! -d $HOME/.m2 ]]; then
+                ln -s "$PWD/maven" "$HOME/.m2"
+              fi
+              cat << EOF > $PWD/maven/settings.xml
+              <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+                <profiles>
+                  <profile>
+                    <id>local-artifactory</id>
+                    <repositories>
+                      <repository>
+                        <id>local-artifactory</id>
+                        <name>local-artifactory</name>
+                        <url>https://artifactory.tools.pez.aws.grogscave.net/artifactory/all</url>
+                      </repository>
+                    </repositories>
+                    <pluginRepositories>
+                      <pluginRepository>
+                      <id>local-artifactory-snaps</id>
+                      <name>local-artifactory</name>
+                      <url>https://artifactory.tools.pez.aws.grogscave.net/artifactory/all</url>
+                    </pluginRepository>
+                    </pluginRepositories>
+                  </profile>
+                </profiles>
+                <activeProfiles>
+                  <activeProfile>local-artifactory</activeProfile>
+                </activeProfiles>
+              </settings>
+              EOF
+              # Added -DskipTests and -Dcheckstyle.skip to speed up task for demo purpose
+              # They should not be included in a proper test pipeline
+              ./mvnw package -DskipTests -Dcheckstyle.skip
+              cp target/*.jar ../target
+    - task: update-build-service-image
+      params:
+        KUBECONFIG_JSON: ((common-secrets.kubeconfigBuildServer))
+      input_mapping:
+        target: target
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            insecure_registries: [((common-secrets.harborDomain))]
+            repository: ((common-secrets.concourseHelperImage))
+            tag: latest
+        inputs:
+          - name: target
+        run:
+          path: /bin/bash
+          args:
+            - -c
+            - |
+              docker login ((common-secrets.harborDomain)) -u ((common-secrets.harborUser)) -p ((common-secrets.harborPassword))
+              echo $KUBECONFIG_JSON>kubeconfig.json
+              export KUBECONFIG=kubeconfig.json
+              set +e
+              kp image list -n ((petclinic.tbsNamespace)) | grep "spring-petclinic" 
+              exists=$?
+              set -e
+              if [ $exists -eq 0 ]; then
+                kp image patch spring-petclinic \
+                  --namespace ((petclinic.tbsNamespace)) \
+                  --local-path target/spring-petclinic-2.3.0.BUILD-SNAPSHOT.jar \
+                  --wait
+              else
+                kp image create spring-petclinic \
+                  --tag ((petclinic.image)) \
+                  --cluster-builder default \
+                  --namespace ((petclinic.tbsNamespace)) \
+                  --local-path target/spring-petclinic-2.3.0.BUILD-SNAPSHOT.jar \
+                  --wait
+              fi
+- name: continuous-deployment
+  public: true
+  serial: true
+  plan:
+    - get: spring-petclinic-image
+      trigger: true
+    - get: config-repo
+    - task: deploy-app
+      params:
+        KUBECONFIG_JSON: ((common-secrets.kubeconfigAppServer))
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            insecure_registries: [((common-secrets.harborDomain))]
+            repository: ((common-secrets.concourseHelperImage))
+            tag: latest
+        inputs:
+          - name: config-repo
+          - name: spring-petclinic-image
+        run:
+          path: /bin/bash
+          args:
+            - -c
+            - |
+              export DIGEST=$(cat spring-petclinic-image/digest)
+
+              # TODO Need to setup the kubeconfig
+              echo $KUBECONFIG_JSON>kubeconfig.json
+              export KUBECONFIG=kubeconfig.json
+
+              cat > config-repo/k8s/values.yml << EOF
+              #@data/values
+              ---
+              petclinic:
+                host: ((petclinic.host))
+                image: ((petclinic.image))@$DIGEST
+                namespace: ((petclinic.tbsNamespace))
+                wavefront:
+                  applicationName: ((petclinic.wavefrontApplicationName))
+                  uri: ((petclinic.wavefrontUri))
+                  apiToken: ((petclinic.wavefrontApiToken))
+              EOF
+              cat config-repo/k8s/values.yml
+              
+              ytt -f config-repo/k8s --ignore-unknown-comments | kapp deploy -n ((petclinic.tbsNamespace)) -a petclinic -y -f -
+
+
