@@ -15,7 +15,7 @@ metadata:
     #@overlay/match missing_ok=True
     projectcontour.io/response-timeout: "900s"
     #@overlay/match missing_ok=True
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-staging
     #@overlay/match missing_ok=True
     ingress.kubernetes.io/force-ssl-redirect: "true"
     #@overlay/match missing_ok=True
