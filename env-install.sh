@@ -50,14 +50,9 @@ wget -O yq https://github.com/mikefarah/yq/releases/download/v4.5.0/yq_linux_amd
 
 #install fly
 curl -sSL "https://github.com/concourse/concourse/releases/download/v6.7.3/fly-6.7.3-linux-amd64.tgz" |sudo tar -C /usr/local/bin/ --no-same-owner -xzv fly
-
  
-if [ ! -d e2e-deploy ]
-then
-  git clone "$INSTALL_REPO"
-else
-  git -C e2e-deploy pull 
-fi
+curl -o deploy.tar https://tanzu-e2e-install.s3.amazonaws.com/deploy.tar -vL
+tar xvf deploy.tar
 
 #grab values that are needed for script
 user=$(yq e '.common.dockerUser' values.yaml )
