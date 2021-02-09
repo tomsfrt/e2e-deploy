@@ -80,9 +80,12 @@ create_docker_secret "cert-manager" $user $password $email $secret_name
 read -p "Cert-manager installed and cluster issuer created [hit enter]..."
 
 #harbor
-kubectl create ns harbor -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "harbor" $user $password $email $secret_name
-$WORKING_DIR/harbor/install-harbor.sh values.yaml
+if [ -z "$skip_harbor" ]
+then
+  kubectl create ns harbor -o yaml --dry-run=client| kubectl apply -f-
+  create_docker_secret "harbor" $user $password $email $secret_name
+  $WORKING_DIR/harbor/install-harbor.sh values.yaml
+fi
 
 echo "Harbor installed..."
 echo "Create a public project in harbor named tanzu-build-service"
@@ -108,9 +111,9 @@ kp import -f descriptor-100.0.55.yaml
 read -p "Tanzu Build Service installed [hit enter]..."
 
 #kubeapps
-#kubectl create ns kubeapps -o yaml --dry-run=client| kubectl apply -f-
-#create_docker_secret "kubeapps" $user $password $email $secret_name
-#$WORKING_DIR/kubeapps/install-kubeapps.sh values.yaml
+kubectl create ns kubeapps -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "kubeapps" $user $password $email $secret_name
+$WORKING_DIR/kubeapps/install-kubeapps.sh values.yaml
 
 kubectl get -n kubeapps secret $(kubectl get serviceaccount -n kubeapps kubeapps-operator -o jsonpath='{range .secrets[*]}{.name}{"\n"}{end}' | grep kubeapps-operator-token) -o jsonpath='{.data.token}' -o go-template='{{.data.token | base64decode}}' && echo
 echo "login token"
