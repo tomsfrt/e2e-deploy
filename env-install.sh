@@ -108,9 +108,9 @@ kp import -f descriptor-100.0.55.yaml
 read -p "Tanzu Build Service installed [hit enter]..."
 
 #kubeapps
-kubectl create ns kubeapps -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "kubeapps" $user $password $email $secret_name
-$WORKING_DIR/kubeapps/install-kubeapps.sh values.yaml
+#kubectl create ns kubeapps -o yaml --dry-run=client| kubectl apply -f-
+#create_docker_secret "kubeapps" $user $password $email $secret_name
+#$WORKING_DIR/kubeapps/install-kubeapps.sh values.yaml
 
 kubectl get -n kubeapps secret $(kubectl get serviceaccount -n kubeapps kubeapps-operator -o jsonpath='{range .secrets[*]}{.name}{"\n"}{end}' | grep kubeapps-operator-token) -o jsonpath='{.data.token}' -o go-template='{{.data.token | base64decode}}' && echo
 echo "login token"
