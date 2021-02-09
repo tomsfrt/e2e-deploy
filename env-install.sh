@@ -100,7 +100,7 @@ tar xvf build-service-1.0.3.tar -C /tmp
 docker login registry.pivotal.io -u $tanzu_user -p $tanzu_password
 docker login $registry/tanzu-build-service/build-service -u admin -p $harbor_password
 
-#kbld relocate -f /tmp/images.lock --lock-output /tmp/images-relocated.lock --repository "$registry/tanzu-build-service/build-service"
+kbld relocate -f /tmp/images.lock --lock-output /tmp/images-relocated.lock --repository "$registry/tanzu-build-service/build-service"
 install_tbs "$registry/tanzu-build-service/build-service" "admin" $harbor_password
 sleep 20
 kp import -f descriptor-100.0.55.yaml 
@@ -116,12 +116,17 @@ kubectl get -n kubeapps secret $(kubectl get serviceaccount -n kubeapps kubeapps
 echo "login token"
 read -p "kubeapps installed [hit enter]..."
 
+#prometheus
+kubectl create ns prometheus -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "prometheus" $user $password $email $secret_name
+$WORKING_DIR/prometheus/install-prometheus.sh values.yaml
+
 #petclinic
 kubectl create ns petclinic -o yaml --dry-run=client| kubectl apply -f-
 create_db $docker "petclinic"
 #do other stuff
 
-#prometheus
+
 
 #grafana
 
