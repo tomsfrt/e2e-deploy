@@ -100,6 +100,12 @@ echo "Harbor installed..."
 echo "Create a public project in harbor named tanzu-build-service"
 read -p "Hit enter to proceed..."
 
+##fluentbit
+kubectl create ns fluentbit -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "fluentbit" $user $password $email $secret_name
+$WORKING_DIR/fluentbit/install-fluentbit.sh values.yaml
+
+
 #concourse
 kubectl create ns concourse -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "concourse" $user $password $email $secret_name
@@ -139,10 +145,6 @@ kubectl create ns kibana -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "kibana" $user $password $email $secret_name
 $WORKING_DIR/kibana/install-kibana.sh values.yaml
 
-##fluentd
-kubectl create ns fluentd -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "fluentd" $user $password $email $secret_name
-$WORKING_DIR/fluentd/install-fluentd.sh values.yaml
 
 #db
 kubectl create ns mysql -o yaml --dry-run=client| kubectl apply -f-
