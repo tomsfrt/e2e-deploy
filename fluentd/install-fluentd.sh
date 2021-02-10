@@ -5,6 +5,6 @@ pull_secret=$WORKING_DIR/../common/pull-secret.yaml
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 
-ytt -f $WORKING_DIR/prom-helm-values.yaml -f $1 | helm template --include-crds bitnami/kube-prometheus -n prometheus --name-template prometheus -f- > $WORKING_DIR/chart.yaml
+ytt -f $WORKING_DIR/fluentd-helm-values.yaml -f $1 | helm template --include-crds bitnami/fluentd -n fluentd --name-template fluentd -f- > $WORKING_DIR/chart.yaml
 
-ytt -f $WORKING_DIR/prom-dependencies.yaml -f $1 -f $WORKING_DIR/chart.yaml -f $pull_secret --file-mark 'chart.yaml:type=yaml-plain' | kapp deploy -a prometheus -n prometheus -f- --diff-changes --yes
+ytt -f $WORKING_DIR/fluentd-dependencies.yaml -f $1 -f $WORKING_DIR/chart.yaml -f $pull_secret --file-mark 'chart.yaml:type=yaml-plain' | kapp deploy -a fluentd -n fluentd -f- --diff-changes --yes
