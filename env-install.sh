@@ -126,11 +126,6 @@ kubectl create ns grafana -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "grafana" $user $password $email $secret_name
 $WORKING_DIR/grafana/install-grafana.sh values.yaml
 
-##fluentd
-kubectl create ns fluentd -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "fluentd" $user $password $email $secret_name
-$WORKING_DIR/fluentd/install-fluentd.sh values.yaml
-
 ##elastic 
 kubectl create ns elasticsearch -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "elasticsearch" $user $password $email $secret_name
@@ -140,6 +135,11 @@ $WORKING_DIR/elasticsearch/install-elasticsearch.sh values.yaml
 kubectl create ns kibana -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "kibana" $user $password $email $secret_name
 $WORKING_DIR/kibana/install-kibana.sh values.yaml
+
+##fluentd
+kubectl create ns fluentd -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "fluentd" $user $password $email $secret_name
+$WORKING_DIR/fluentd/install-fluentd.sh values.yaml
 
 #db
 kubectl create ns mysql -o yaml --dry-run=client| kubectl apply -f-

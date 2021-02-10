@@ -13,3 +13,8 @@ ingress:
     kubernetes.io/ingress.class: contour
     kubernetes.io/tls-acme: "true"
   tls: true
+  elasticsearch:
+    tls: false
+    hosts:
+      - elasticsearch-elasticsearch-data
+    port: 9200
