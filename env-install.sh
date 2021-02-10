@@ -142,15 +142,17 @@ kubectl create ns fluentd -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "fluentd" $user $password $email $secret_name
 $WORKING_DIR/fluentd/install-fluentd.sh values.yaml
 
+##elastic 
+kubectl create ns elasticsearch -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "elasticsearch" $user $password $email $secret_name
+$WORKING_DIR/elasticsearch/install-elastic.sh values.yaml
+
+
 ##kibana
 kubectl create ns kibana -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "kibana" $user $password $email $secret_name
 $WORKING_DIR/kibana/install-kibana.sh values.yaml
 
-##elastic 
-kubectl create ns elasticsearch -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "elasticsearch" $user $password $email $secret_name
-$WORKING_DIR/elasticsearch/install-elastic.sh values.yaml
 
 
 #petclinic
