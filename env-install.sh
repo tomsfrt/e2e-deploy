@@ -128,14 +128,14 @@ docker=$(yq e '.registry.dockerhub' values.yaml )
 #read -p "kubeapps installed [hit enter]..."
 #
 ##prometheus
-#kubectl create ns prometheus -o yaml --dry-run=client| kubectl apply -f-
-#create_docker_secret "prometheus" $user $password $email $secret_name
-#$WORKING_DIR/prometheus/install-prometheus.sh values.yaml
-#
+kubectl create ns prometheus -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "prometheus" $user $password $email $secret_name
+$WORKING_DIR/prometheus/install-prometheus.sh values.yaml
+
 ##grafana
-#kubectl create ns grafana -o yaml --dry-run=client| kubectl apply -f-
-#create_docker_secret "grafana" $user $password $email $secret_name
-#$WORKING_DIR/grafana/install-grafana.sh values.yaml
+kubectl create ns grafana -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "grafana" $user $password $email $secret_name
+$WORKING_DIR/grafana/install-grafana.sh values.yaml
 
 ##fluentd
 kubectl create ns fluentd -o yaml --dry-run=client| kubectl apply -f-
