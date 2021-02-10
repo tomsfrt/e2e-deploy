@@ -82,6 +82,7 @@ read -p "Cert-manager installed and cluster issuer created [hit enter]..."
 #harbor
 if [ -z "$skip_harbor" ]
 then
+
   kubectl create ns harbor -o yaml --dry-run=client| kubectl apply -f-
   create_docker_secret "harbor" $user $password $email $secret_name
   $WORKING_DIR/harbor/install-harbor.sh values.yaml
@@ -114,6 +115,8 @@ read -p "Tanzu Build Service installed [hit enter]..."
 kubectl create ns kubeapps -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "kubeapps" $user $password $email $secret_name
 $WORKING_DIR/kubeapps/install-kubeapps.sh values.yaml
+
+sleep 10
 
 kubectl get -n kubeapps secret $(kubectl get serviceaccount -n kubeapps kubeapps-operator -o jsonpath='{range .secrets[*]}{.name}{"\n"}{end}' | grep kubeapps-operator-token) -o jsonpath='{.data.token}' -o go-template='{{.data.token | base64decode}}' && echo
 echo "login token"

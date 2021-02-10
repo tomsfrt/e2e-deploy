@@ -10,7 +10,7 @@ spec:
     email: #@ data.values.common.dockerEmail
     privateKeySecretRef:
       name: letsencrypt-staging
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    server: https://acme-v02.api.letsencrypt.org/directory
     solvers:
     - http01:
         ingress:

@@ -1,27 +1,11 @@
 #@ load("@ytt:data", "data")
 
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: apprepositories.kubeapps.com
-spec:
-  group: kubeapps.com
-  scope: Namespaced
-  names:
-    kind: AppRepository
-    plural: apprepositories
-    shortNames:
-      - apprepos
-  version: v1alpha1
-
----
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: kubeapps
   name: kubeapps-operator
-
+  namespace: kubeapps
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
