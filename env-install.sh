@@ -69,72 +69,89 @@ tanzu_user=$(yq e '.tanzu.user' values.yaml )
 tanzu_password=$(yq e '.tanzu.password' values.yaml )
 harbor_password=$(yq e '.harbor.adminPassword' values.yaml )
 docker=$(yq e '.registry.dockerhub' values.yaml )
-#contour
-curl -L  https://projectcontour.io/quickstart/contour.yaml > contour.yaml
-ytt --ignore-unknown-comments -f contour.yaml -f $WORKING_DIR/values.yaml -f $WORKING_DIR/common/pull-secret.yaml -f $WORKING_DIR/common/lb-external-traffic.yaml | kubectl apply -f-
-create_docker_secret "projectcontour" $user $password $email $secret_name
 
-kubectl get services envoy -n projectcontour
-read -p "create wildcard entry for your lb and press enter to proceed..."
+##contour
+#curl -L  https://projectcontour.io/quickstart/contour.yaml > contour.yaml
+#ytt --ignore-unknown-comments -f contour.yaml -f $WORKING_DIR/values.yaml -f $WORKING_DIR/common/pull-secret.yaml -f $WORKING_DIR/common/lb-external-traffic.yaml | kubectl apply -f-
+#create_docker_secret "projectcontour" $user $password $email $secret_name
+#
+#kubectl get services envoy -n projectcontour
+#read -p "create wildcard entry for your lb and press enter to proceed..."
+#
+##certgen
+#$WORKING_DIR/certgen/install.sh values.yaml
+#create_docker_secret "cert-manager" $user $password $email $secret_name
+#
+#read -p "Cert-manager installed and cluster issuer created [hit enter]..."
+#
+##harbor
+#if [ -z "$skip_harbor" ]
+#then
+#
+#  kubectl create ns harbor -o yaml --dry-run=client| kubectl apply -f-
+#  create_docker_secret "harbor" $user $password $email $secret_name
+#  $WORKING_DIR/harbor/install-harbor.sh values.yaml
+#fi
+#
+#echo "Harbor installed..."
+#echo "Create a public project in harbor named tanzu-build-service"
+#read -p "Hit enter to proceed..."
+#
+##concourse
+#kubectl create ns concourse -o yaml --dry-run=client| kubectl apply -f-
+#create_docker_secret "concourse" $user $password $email $secret_name
+#$WORKING_DIR/concourse/install-concourse.sh values.yaml
+#
+#read -p "Concourse installed [hit enter]..."
+#
+##build service
+#tar xvf build-service-1.0.3.tar -C /tmp
+#docker login registry.pivotal.io -u $tanzu_user -p $tanzu_password
+#docker login $registry/tanzu-build-service/build-service -u admin -p $harbor_password
+#
+#kbld relocate -f /tmp/images.lock --lock-output /tmp/images-relocated.lock --repository "$registry/tanzu-build-service/build-service"
+#install_tbs "$registry/tanzu-build-service/build-service" "admin" $harbor_password
+#sleep 20
+#kp import -f descriptor-100.0.55.yaml 
+#
+#read -p "Tanzu Build Service installed [hit enter]..."
+#
+##kubeapps
+#kubectl create ns kubeapps -o yaml --dry-run=client| kubectl apply -f-
+#create_docker_secret "kubeapps" $user $password $email $secret_name
+#$WORKING_DIR/kubeapps/install-kubeapps.sh values.yaml
+#
+#sleep 10
+#
+#kubectl get -n kubeapps secret $(kubectl get serviceaccount -n kubeapps kubeapps-operator -o jsonpath='{range .secrets[*]}{.name}{"\n"}{end}' | grep kubeapps-operator-token) -o jsonpath='{.data.token}' -o go-template='{{.data.token | base64decode}}' && echo
+#echo "login token"
+#read -p "kubeapps installed [hit enter]..."
+#
+##prometheus
+#kubectl create ns prometheus -o yaml --dry-run=client| kubectl apply -f-
+#create_docker_secret "prometheus" $user $password $email $secret_name
+#$WORKING_DIR/prometheus/install-prometheus.sh values.yaml
+#
+##grafana
+#kubectl create ns grafana -o yaml --dry-run=client| kubectl apply -f-
+#create_docker_secret "grafana" $user $password $email $secret_name
+#$WORKING_DIR/grafana/install-grafana.sh values.yaml
 
-#certgen
-$WORKING_DIR/certgen/install.sh values.yaml
-create_docker_secret "cert-manager" $user $password $email $secret_name
+##fluentd
+kubectl create ns fluentd -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "fluentd" $user $password $email $secret_name
+$WORKING_DIR/fluentd/install-fluentd.sh values.yaml
 
-read -p "Cert-manager installed and cluster issuer created [hit enter]..."
+##kibana
+kubectl create ns kibana -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "kibana" $user $password $email $secret_name
+$WORKING_DIR/kibana/install-kibana.sh values.yaml
 
-#harbor
-if [ -z "$skip_harbor" ]
-then
+##elastic 
+kubectl create ns elasticsearch -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "elasticsearch" $user $password $email $secret_name
+$WORKING_DIR/elasticsearch/install-elastic.sh values.yaml
 
-  kubectl create ns harbor -o yaml --dry-run=client| kubectl apply -f-
-  create_docker_secret "harbor" $user $password $email $secret_name
-  $WORKING_DIR/harbor/install-harbor.sh values.yaml
-fi
-
-echo "Harbor installed..."
-echo "Create a public project in harbor named tanzu-build-service"
-read -p "Hit enter to proceed..."
-
-#concourse
-kubectl create ns concourse -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "concourse" $user $password $email $secret_name
-$WORKING_DIR/concourse/install-concourse.sh values.yaml
-
-read -p "Concourse installed [hit enter]..."
-
-#build service
-tar xvf build-service-1.0.3.tar -C /tmp
-docker login registry.pivotal.io -u $tanzu_user -p $tanzu_password
-docker login $registry/tanzu-build-service/build-service -u admin -p $harbor_password
-
-kbld relocate -f /tmp/images.lock --lock-output /tmp/images-relocated.lock --repository "$registry/tanzu-build-service/build-service"
-install_tbs "$registry/tanzu-build-service/build-service" "admin" $harbor_password
-sleep 20
-kp import -f descriptor-100.0.55.yaml 
-
-read -p "Tanzu Build Service installed [hit enter]..."
-
-#kubeapps
-kubectl create ns kubeapps -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "kubeapps" $user $password $email $secret_name
-$WORKING_DIR/kubeapps/install-kubeapps.sh values.yaml
-
-sleep 10
-
-kubectl get -n kubeapps secret $(kubectl get serviceaccount -n kubeapps kubeapps-operator -o jsonpath='{range .secrets[*]}{.name}{"\n"}{end}' | grep kubeapps-operator-token) -o jsonpath='{.data.token}' -o go-template='{{.data.token | base64decode}}' && echo
-echo "login token"
-read -p "kubeapps installed [hit enter]..."
-
-#prometheus
-kubectl create ns prometheus -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "prometheus" $user $password $email $secret_name
-$WORKING_DIR/prometheus/install-prometheus.sh values.yaml
-
-#grafana
-kubectl create ns grafana -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "grafana" $user $password $email $secret_name
-$WORKING_DIR/grafana/install-grafana.sh values.yaml
 
 #petclinic
 kubectl create ns mysql -o yaml --dry-run=client| kubectl apply -f-
