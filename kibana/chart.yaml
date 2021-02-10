@@ -1,3 +1,5 @@
+#@ load("@ytt:data", "data")
+
 ---
 # Source: kibana/templates/configmap.yaml
 apiVersion: v1
