@@ -1,0 +1,203 @@
+---
+# Source: kibana/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kibana-conf
+  labels:
+    app.kubernetes.io/name: kibana
+    helm.sh/chart: kibana-7.2.1
+    app.kubernetes.io/instance: kibana
+    app.kubernetes.io/managed-by: Helm
+data:
+  kibana.yml: |
+    pid.file: /opt/bitnami/kibana/tmp/kibana.pid
+    server.host: "::"
+    server.port: 5601
+    elasticsearch.hosts: [http://elasticsearch-elasticsearch-data:9200]
+    server.rewriteBasePath: false
+---
+# Source: kibana/templates/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: kibana
+  labels:
+    app.kubernetes.io/name: kibana
+    helm.sh/chart: kibana-7.2.1
+    app.kubernetes.io/instance: kibana
+    app.kubernetes.io/managed-by: Helm
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "10Gi"
+---
+# Source: kibana/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  labels:
+    app.kubernetes.io/name: kibana
+    helm.sh/chart: kibana-7.2.1
+    app.kubernetes.io/instance: kibana
+    app.kubernetes.io/managed-by: Helm
+
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 5601
+      targetPort: http
+      nodePort: null
+  selector:
+    app.kubernetes.io/name: kibana
+    app.kubernetes.io/instance: kibana
+---
+# Source: kibana/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  labels:
+    app.kubernetes.io/name: kibana
+    helm.sh/chart: kibana-7.2.1
+    app.kubernetes.io/instance: kibana
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kibana
+      app.kubernetes.io/instance: kibana
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kibana
+        helm.sh/chart: kibana-7.2.1
+        app.kubernetes.io/instance: kibana
+        app.kubernetes.io/managed-by: Helm
+        app: kibana
+    spec:
+      
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: kibana
+                    app.kubernetes.io/instance: kibana
+                namespaces:
+                  - kibana
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+      containers:
+        - name: kibana
+          image: docker.io/bitnami/kibana:7.10.2-debian-10-r11
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 1001
+          env:
+            - name: KIBANA_ELASTICSEARCH_URL
+              value: "http://elasticsearch-elasticsearch-data:9200"
+            - name: KIBANA_ELASTICSEARCH_PORT
+              value: "9200"
+            - name: KIBANA_FORCE_INITSCRIPTS
+              value: "false"
+          ports:
+            - name: http
+              containerPort: 5601
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /app/kibana
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /app/kibana
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          volumeMounts:
+            - name: kibana-data
+              mountPath: /bitnami/kibana
+            - name: kibana-config
+              mountPath: /bitnami/kibana/conf
+      volumes:
+        - name: kibana-data
+          persistentVolumeClaim:
+            claimName: kibana
+        - name: kibana-config
+          configMap:
+            name: kibana-conf
+---
+# Source: kibana/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: kibana
+  namespace: kibana
+  labels:
+    app.kubernetes.io/name: kibana
+    helm.sh/chart: kibana-7.2.1
+    app.kubernetes.io/instance: kibana
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    kubernetes.io/ingress.class: contour
+    kubernetes.io/tls-acme: "true"
+spec:
+  rules:
+    - host: kibana.test2.tsfrt.info
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: kibana
+              servicePort: http
+  tls:
+    - hosts:
+        - kibana.test2.tsfrt.info
+      secretName: kibana.test2.tsfrt.info-tls
+---
+# Source: kibana/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "kibana-test-connection"
+  labels:
+    app.kubernetes.io/name: kibana
+    helm.sh/chart: kibana-7.2.1
+    app.kubernetes.io/instance: kibana
+    app.kubernetes.io/managed-by: Helm
+    app: test-connection
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: bitnami/minideb
+      command: ['wget']
+      args: ['kibana:5601']
+  restartPolicy: Never
