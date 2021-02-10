@@ -112,7 +112,7 @@ spec:
             runAsUser: 1001
           env:
             - name: KIBANA_ELASTICSEARCH_URL
-              value: "http://elasticsearch-elasticsearch-data:9200"
+              value: "http://elasticsearch-elasticsearch-data.elasticsearch.svc.cluster.local:9200"
             - name: KIBANA_ELASTICSEARCH_PORT
               value: "9200"
             - name: KIBANA_FORCE_INITSCRIPTS
