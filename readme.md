@@ -19,13 +19,8 @@ newgrp docker
 ## Run install
 
 ```bash
-curl -o deploy.tar https://tanzu-e2e-install.s3.amazonaws.com/deploy.tar -vL
 
-tar xvf deploy.tar
-
-cd e2e-deploy
-
-chmod +x env-install.sh
+git clone https://github.com/tomsfrt/e2e-deploy.git
 
 #make sure you have kubectl access to your cluster
 

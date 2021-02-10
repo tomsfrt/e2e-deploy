@@ -19,5 +19,5 @@ harbor:
   adminPassword: Harbor12345
   diskSize: 50Gi
 registry:
-  dockerhub: harbor.test.tsfrt.info/dockerhub
+  dockerhub: <docker.io or your proxy>
 

@@ -3,7 +3,11 @@
 set -e
 WORKING_DIR=$(dirname "$0")
 source $WORKING_DIR/functions.sh
-INSTALL_REPO=https://github.com/tomsfrt/e2e-deploy.git
+INSTALL_REPO=https://tanzu-e2e-install.s3.amazonaws.com/deploy.tar
+
+if [[ -z $WORKING_DIR/values.yaml ]]; then
+    echo "Missing values.yaml, setup your values.yaml file and run again"
+fi
 
 KAPP_VERSION=v0.35.0
 YTT_VERSION=v0.31.0
@@ -51,7 +55,7 @@ wget -O yq https://github.com/mikefarah/yq/releases/download/v4.5.0/yq_linux_amd
 #install fly
 curl -sSL "https://github.com/concourse/concourse/releases/download/v6.7.3/fly-6.7.3-linux-amd64.tgz" |sudo tar -C /usr/local/bin/ --no-same-owner -xzv fly
  
-curl -o deploy.tar https://tanzu-e2e-install.s3.amazonaws.com/deploy.tar -vL
+curl -o deploy.tar $INSTALL_REPO -vL
 tar xvf deploy.tar
 
 #grab values that are needed for script
@@ -130,7 +134,7 @@ $WORKING_DIR/prometheus/install-prometheus.sh values.yaml
 #grafana
 kubectl create ns grafana -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "grafana" $user $password $email $secret_name
-$WORKING_DIR/prometheus/install-grafana.sh values.yaml
+$WORKING_DIR/grafana/install-grafana.sh values.yaml
 
 #petclinic
 kubectl create ns mysql -o yaml --dry-run=client| kubectl apply -f-

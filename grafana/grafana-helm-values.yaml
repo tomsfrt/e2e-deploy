@@ -1,15 +1,13 @@
 ingress:
   enabled: true
+  hostname: #@ "grafana.{}".format(data.values.ingress.domain)
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-staging
     ingress.kubernetes.io/force-ssl-redirect: "true"
     kubernetes.io/ingress.class: contour
     kubernetes.io/tls-acme: "true"
-  hosts:
-    - name: #@ "grafana.{}".format(data.values.ingress.domain)
-      paths: ["/"]
-      tls: true
-      tlsSecret: grafana-tls
+  tls: true
+  tlsSecret: grafana-tls
 imageRenderer:
   enabled: true
 metrics:
