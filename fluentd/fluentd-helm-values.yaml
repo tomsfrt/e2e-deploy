@@ -38,8 +38,6 @@ configMapFiles:
     <match fluentd.healthcheck>
       @type stdout
     </match>
-    {{ if .Values.aggregator.enabled }}
-    # Forward all logs to the aggregators
     <match **>
       @type elasticsearch
       include_tag_key true
