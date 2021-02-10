@@ -145,7 +145,7 @@ $WORKING_DIR/fluentd/install-fluentd.sh values.yaml
 ##elastic 
 kubectl create ns elasticsearch -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "elasticsearch" $user $password $email $secret_name
-$WORKING_DIR/elasticsearch/install-elastic.sh values.yaml
+$WORKING_DIR/elasticsearch/install-elasticsearch.sh values.yaml
 
 
 ##kibana
