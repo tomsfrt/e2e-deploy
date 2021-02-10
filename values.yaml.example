@@ -1,0 +1,23 @@
+#@data/values
+---
+common:
+  imagePullSecret: <image secret name, can be anything>
+  dockerUser: <docker user>
+  dockerPassword: <docker password>
+  dockerEmail: <docker email>
+tanzu:
+  user: <tanzu network user>
+  password: <tanzu network password>
+ingress:
+  domain: <ingress domain, assumes wild card dns>
+  contour_tls_namespace: projectcontour
+  contour_tls_secret: contour-tls
+concourse:
+  username: test
+  password: password
+harbor:
+  adminPassword: Harbor12345
+  diskSize: 50Gi
+registry:
+  dockerhub: harbor.test.tsfrt.info/dockerhub
+

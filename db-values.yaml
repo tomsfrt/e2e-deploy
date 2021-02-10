@@ -4,13 +4,13 @@ metrics:
   image:
     registry: $MYSQL_REGISTRY
 db:
-  name: petclinic
-  password: petclinic
-  user: petclinic
+  name: e2edb
+  password: e2edb
+  user: e2edb
 replication:
   enabled: false
 root:
-  password: petclinic
+  password: e2edb
 primary:
   livenessProbe:
     enabled: false
