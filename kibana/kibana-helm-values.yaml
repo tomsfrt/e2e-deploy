@@ -16,5 +16,5 @@ ingress:
 elasticsearch:
   tls: false
   hosts:
-    - elasticsearch-elasticsearch-data
+    - elasticsearch-elasticsearch-data.elasticsearch.svc.cluster.local
   port: 9200
