@@ -127,16 +127,18 @@ kubectl create ns prometheus -o yaml --dry-run=client| kubectl apply -f-
 create_docker_secret "prometheus" $user $password $email $secret_name
 $WORKING_DIR/prometheus/install-prometheus.sh values.yaml
 
+#grafana
+kubectl create ns grafana -o yaml --dry-run=client| kubectl apply -f-
+create_docker_secret "grafana" $user $password $email $secret_name
+$WORKING_DIR/prometheus/install-grafana.sh values.yaml
+
 #petclinic
 kubectl create ns mysql -o yaml --dry-run=client| kubectl apply -f-
 create_db $docker "mysql"
-#do other stuff
 
 
 
-#grafana
 
-#fluentd
 
 
 
