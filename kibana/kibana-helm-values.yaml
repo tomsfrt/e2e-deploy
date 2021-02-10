@@ -1,3 +1,5 @@
+#@ load("@ytt:data", "data")
+
 ingress:
   enabled: true
   certManager: false

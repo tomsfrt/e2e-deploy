@@ -1,3 +1,5 @@
+#@ load("@ytt:data", "data")
+
 ingress:
   enabled: true
   hostname: #@ "grafana.{}".format(data.values.ingress.domain)
