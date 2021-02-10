@@ -484,13 +484,13 @@ spec:
           imagePullPolicy: "IfNotPresent"
           env:
             - name: FLUENTD_CONF
-              value: fluentd.conf
+              value: "fluentd.conf"
             - name: FLUENTD_OPT
               value: ""
             - name: ELASTICSEARCH_HOST
-              value: elasticsearch-elasticsearch-data.elasticsearch.svc.cluster.local
+              value: "elasticsearch-elasticsearch-data.elasticsearch.svc.cluster.local"
             - name: ELASTICSEARCH_PORT
-              value: 9200
+              value: "9200"
           ports:
             - name: tcp
               containerPort: 24224
