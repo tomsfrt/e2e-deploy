@@ -168,7 +168,7 @@ metadata:
     kubernetes.io/tls-acme: "true"
 spec:
   rules:
-    - host: kibana.test2.tsfrt.info
+    - host: #@ "kibana.{}".format(data.values.ingress.domain)
       http:
         paths:
           - path: /
@@ -178,26 +178,5 @@ spec:
               servicePort: http
   tls:
     - hosts:
-        - kibana.test2.tsfrt.info
-      secretName: kibana.test2.tsfrt.info-tls
----
-# Source: kibana/templates/tests/test-connection.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: "kibana-test-connection"
-  labels:
-    app.kubernetes.io/name: kibana
-    helm.sh/chart: kibana-7.2.1
-    app.kubernetes.io/instance: kibana
-    app.kubernetes.io/managed-by: Helm
-    app: test-connection
-  annotations:
-    "helm.sh/hook": test-success
-spec:
-  containers:
-    - name: wget
-      image: bitnami/minideb
-      command: ['wget']
-      args: ['kibana:5601']
-  restartPolicy: Never
+        - #@ "kibana.{}".format(data.values.ingress.domain)
+      secretName: #@ "kibana.{}".format(data.values.ingress.domain)
