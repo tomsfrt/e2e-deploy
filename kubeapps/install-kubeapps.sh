@@ -7,8 +7,5 @@ helm repo update
 
 ytt -f $WORKING_DIR/kubeapps-helm-values.yaml -f $1 | helm template bitnami/kubeapps --include-crds --name-template kubeapps -f- > $WORKING_DIR/chart.yaml
 
-#kubeapps always fails with kapp
-ytt -f  $WORKING_DIR/integrate-contour-overlay.yaml -f $WORKING_DIR/chart.yaml -f $1 -f $pull_secret --file-mark 'chart.yaml:type=yaml-plain' > $WORKING_DIR/install.yaml
-kubectl delete -f $WORKING_DIR/install.yaml -n kubeapps
-kubectl apply -f kubeapps-dependencies.yaml
-kubectl apply -f $WORKING_DIR/install.yaml -n kubeapps
+ytt -f  $WORKING_DIR/integrate-contour-overlay.yaml -f $WORKING_DIR/chart.yaml -f $1 -f $pull_secret --file-mark 'chart.yaml:type=yaml-plain' | kapp deploy -a kubeapps -n kubeapps -f- --diff-changes --yes
+
