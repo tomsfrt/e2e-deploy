@@ -107,9 +107,9 @@ $WORKING_DIR/fluentbit/install-fluentbit.sh values.yaml
 
 
 #concourse
-kubectl create ns concourse -o yaml --dry-run=client| kubectl apply -f-
-create_docker_secret "concourse" $user $password $email $secret_name
-$WORKING_DIR/concourse/install-concourse.sh values.yaml
+#kubectl create ns concourse -o yaml --dry-run=client| kubectl apply -f-
+#create_docker_secret "concourse" $user $password $email $secret_name
+#$WORKING_DIR/concourse/install-concourse.sh values.yaml
 
 read -p "Concourse installed [hit enter]..."
 
