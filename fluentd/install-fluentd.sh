@@ -8,7 +8,7 @@ helm repo update
 ytt -f $WORKING_DIR/fluentd-helm-values.yaml -f $1 | helm template \
 --set aggregator.configMap=elasticsearch-output \
 --set aggregator.extraEnv[0].name=elasticsearch-elasticsearch-data.elasticsearch.svc.cluster.local \
---set aggregator.extraEnv[1].name=9200 \
+--set aggregator.extraEnv[0].name=9200 \
 --include-crds bitnami/fluentd \
 -n fluentd \
 --name-template fluentd \
