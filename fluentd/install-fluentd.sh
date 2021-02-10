@@ -13,4 +13,4 @@ helm template \
 -n fluentd \
 --name-template fluentd  > $WORKING_DIR/chart.yaml
 
-ytt -f $WORKING_DIR/fluentd-dependencies.yaml -f $1 -f $WORKING_DIR/chart.yaml -f $pull_secret --file-mark 'chart.yaml:type=yaml-plain' | kapp deploy -a fluentd -n fluentd -f- --diff-changes --yes
+ytt  -f $1 -f $WORKING_DIR/chart.yaml -f $pull_secret --file-mark 'chart.yaml:type=yaml-plain' | kapp deploy -a fluentd -n fluentd -f- --diff-changes --yes
