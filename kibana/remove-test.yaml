@@ -1,5 +1,0 @@
-#@ load("@ytt:overlay", "overlay")
-
-#@overlay/match by=overlay.subset({"kind": "Pod", "metadata:":{"name":"kibana-test-connection"}})
----
-#@overlay/remove
