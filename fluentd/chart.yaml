@@ -11,6 +11,77 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: forwarder
 ---
+# Source: fluentd/templates/aggregator-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-aggregator-cm
+  labels:
+    app.kubernetes.io/name: fluentd
+    helm.sh/chart: fluentd-3.5.0
+    app.kubernetes.io/instance: fluentd
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: aggregator
+data:
+  fluentd-inputs.conf: |
+    # TCP input to receive logs from
+    <source>
+      @type forward
+      bind 0.0.0.0
+      port 24224
+    </source>
+    
+    # HTTP input for the liveness and readiness probes
+    <source>
+      @type http
+      bind 0.0.0.0
+      port 9880
+    </source>
+    
+  fluentd-output.conf: |
+    # Throw the healthcheck to the standard output
+    <match fluentd.healthcheck>
+      @type stdout
+    </match>
+    
+    # Send the logs to the standard output
+    <match **>
+      @type stdout
+    </match>
+    
+  fluentd.conf: |
+    # Ignore fluentd own events
+    <match fluent.**>
+      @type null
+    </match>
+    
+    @include fluentd-inputs.conf
+    @include fluentd-output.conf
+    
+  metrics.conf: |
+    # Prometheus Exporter Plugin
+    # input plugin that exports metrics
+    <source>
+      @type prometheus
+      port 24231
+    </source>
+    
+    # input plugin that collects metrics from MonitorAgent
+    <source>
+      @type prometheus_monitor
+      <labels>
+        host #{hostname}
+      </labels>
+    </source>
+    
+    # input plugin that collects metrics for output plugin
+    <source>
+      @type prometheus_output_monitor
+      <labels>
+        host #{hostname}
+      </labels>
+    </source>
+---
 # Source: fluentd/templates/forwarder-configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -382,7 +453,7 @@ spec:
         app.kubernetes.io/component: aggregator
         app: aggregator
       annotations:
-        checksum/config: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        checksum/config: 69ebe3b4a7bb4849e8734f5076e089e94127cc6a954c4fd41724751a0e2bb9e8
     spec:
       
       serviceAccountName: default
@@ -465,6 +536,6 @@ spec:
       volumes:
         - name: fluentd-config
           configMap:
-            name: elasticsearch-output
+            name: fluentd-aggregator-cm
         - name: buffer
           emptyDir: {}

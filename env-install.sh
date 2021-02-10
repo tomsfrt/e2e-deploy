@@ -70,6 +70,9 @@ tanzu_password=$(yq e '.tanzu.password' values.yaml )
 harbor_password=$(yq e '.harbor.adminPassword' values.yaml )
 docker=$(yq e '.registry.dockerhub' values.yaml )
 
+#metrics
+kubectl apply -f metrics/metrics.yaml
+
 #contour
 curl -L  https://projectcontour.io/quickstart/contour.yaml > contour.yaml
 ytt --ignore-unknown-comments -f contour.yaml -f $WORKING_DIR/values.yaml -f $WORKING_DIR/common/pull-secret.yaml -f $WORKING_DIR/common/lb-external-traffic.yaml | kubectl apply -f-
