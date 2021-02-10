@@ -128,8 +128,8 @@ create_docker_secret "prometheus" $user $password $email $secret_name
 $WORKING_DIR/prometheus/install-prometheus.sh values.yaml
 
 #petclinic
-kubectl create ns petclinic -o yaml --dry-run=client| kubectl apply -f-
-create_db $docker "petclinic"
+kubectl create ns mysql -o yaml --dry-run=client| kubectl apply -f-
+create_db $docker "mysql"
 #do other stuff
 
 

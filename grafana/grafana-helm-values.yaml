@@ -1,0 +1,23 @@
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    kubernetes.io/ingress.class: contour
+    kubernetes.io/tls-acme: "true"
+  hosts:
+    - name: #@ "grafana.{}".format(data.values.ingress.domain)
+      paths: ["/"]
+      tls: true
+      tlsSecret: grafana-tls
+imageRenderer:
+  enabled: true
+metrics:
+    enabled: true
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8080"
+      prometheus.io/path: "/metrics"
+    serviceMonitor:
+      enabled: true
+      namespace: prometheus
