@@ -7,8 +7,8 @@ helm repo update
 
 helm template \
 --set aggregator.configMap=elasticsearch-output \
---set aggregator.extraEnv[0].name=elasticsearch-elasticsearch-data.elasticsearch.svc.cluster.local \
---set aggregator.extraEnv[0].name=9200 \
+--set aggregator.extraEnv[0].name="elasticsearch-elasticsearch-data.elasticsearch.svc.cluster.local" \
+--set aggregator.extraEnv[0].name="9200" \
 --include-crds bitnami/fluentd \
 -n fluentd \
 --name-template fluentd  > $WORKING_DIR/chart.yaml
