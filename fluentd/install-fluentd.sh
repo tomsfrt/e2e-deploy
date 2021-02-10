@@ -6,7 +6,7 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 
 helm template \
---set aggregator.configMap=elasticsearch-output \
+--set aggregator.configMap="elasticsearch-output" \
 --set aggregator.extraEnv[0].name="elasticsearch-elasticsearch-data.elasticsearch.svc.cluster.local" \
 --set aggregator.extraEnv[0].name="9200" \
 --include-crds bitnami/fluentd \
