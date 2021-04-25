@@ -10,7 +10,7 @@ if [[ -z $WORKING_DIR/values.yaml ]]; then
 fi
 
 KAPP_VERSION=v0.35.0
-YTT_VERSION=v0.31.0
+YTT_VERSION=v0.32.0
 HELM_VERSION=helm-v3.5.2-linux-amd64
 KUBECTL_VERSION=v1.20.0
 GIT_VERSION=git-2.9.5
@@ -75,7 +75,7 @@ kubectl apply -f metrics/metrics.yaml
 
 #contour
 curl -L  https://projectcontour.io/quickstart/contour.yaml > contour.yaml
-ytt --ignore-unknown-comments -f contour.yaml -f $WORKING_DIR/values.yaml -f $WORKING_DIR/common/pull-secret.yaml -f $WORKING_DIR/common/lb-external-traffic.yaml | kubectl apply -f-
+ytt -f contour.yaml -f $WORKING_DIR/values.yaml -f $WORKING_DIR/common/pull-secret.yaml -f $WORKING_DIR/common/lb-external-traffic.yaml | kubectl apply -f-
 create_docker_secret "projectcontour" $user $password $email $secret_name
 
 kubectl get services envoy -n projectcontour
