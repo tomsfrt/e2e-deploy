@@ -9,17 +9,12 @@ metadata:
 
 #@overlay/match by=overlay.subset(resource("Ingress","harbor-harbor-ingress"))
 ---
+#@overlay/match-child-defaults missing_ok=True
 metadata:
-  #@overlay/match missing_ok=True
   annotations:
-    #@overlay/match missing_ok=True
     projectcontour.io/response-timeout: "900s"
-    #@overlay/match missing_ok=True
     cert-manager.io/cluster-issuer: letsencrypt-staging
-    #@overlay/match missing_ok=True
     ingress.kubernetes.io/force-ssl-redirect: "true"
-    #@overlay/match missing_ok=True
     kubernetes.io/ingress.class: contour
-    #@overlay/match missing_ok=True
     kubernetes.io/tls-acme: "true"
 
